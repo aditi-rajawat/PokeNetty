@@ -72,7 +72,7 @@ public class ElectionManager implements ElectionListener {
 	private static ServerConf conf;
 
 	// number of times we try to get the leader when a node starts up
-	private int firstTime = 3;	// keep it 4
+	private int firstTime = 4;	// keep it 4
 
 	/** The election that is in progress - only ONE! */
 	private Election election;

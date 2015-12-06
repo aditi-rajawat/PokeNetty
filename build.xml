@@ -83,9 +83,10 @@
 
 	<target name="server" depends="build">
 		<java fork="yes" maxmemory="1024m" classname="poke.server.Server">
-			<arg value="${basedir}/runtime/mesh1/server4.conf" />
+			<arg value="${basedir}/runtime/mesh1/server3.conf" />
 			<classpath refid="project.classpath" />
 		</java>
 	</target>
+	
 
 </project>

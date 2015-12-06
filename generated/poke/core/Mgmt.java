@@ -1122,7 +1122,7 @@ public final class Mgmt {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 elect_id = 2;</code>
+     * <code>required int64 elect_id = 2;</code>
      *
      * <pre>
      * election ID (not candidate)
@@ -1130,13 +1130,13 @@ public final class Mgmt {
      */
     boolean hasElectId();
     /**
-     * <code>required int32 elect_id = 2;</code>
+     * <code>required int64 elect_id = 2;</code>
      *
      * <pre>
      * election ID (not candidate)
      * </pre>
      */
-    int getElectId();
+    long getElectId();
 
     /**
      * <code>required int32 candidate_id = 3;</code>
@@ -1264,7 +1264,7 @@ public final class Mgmt {
             }
             case 16: {
               bitField0_ |= 0x00000001;
-              electId_ = input.readInt32();
+              electId_ = input.readInt64();
               break;
             }
             case 24: {
@@ -1348,13 +1348,13 @@ public final class Mgmt {
        */
       DECLAREELECTION(0, 1),
       /**
-       * <code>NOMINATE = 2;</code>
+       * <code>PROPOSAL = 2;</code>
        */
-      NOMINATE(1, 2),
+      PROPOSAL(1, 2),
       /**
-       * <code>ABSTAIN = 3;</code>
+       * <code>NOMINATE = 3;</code>
        */
-      ABSTAIN(2, 3),
+      NOMINATE(2, 3),
       /**
        * <code>DECLAREWINNER = 4;</code>
        */
@@ -1378,13 +1378,13 @@ public final class Mgmt {
        */
       public static final int DECLAREELECTION_VALUE = 1;
       /**
-       * <code>NOMINATE = 2;</code>
+       * <code>PROPOSAL = 2;</code>
        */
-      public static final int NOMINATE_VALUE = 2;
+      public static final int PROPOSAL_VALUE = 2;
       /**
-       * <code>ABSTAIN = 3;</code>
+       * <code>NOMINATE = 3;</code>
        */
-      public static final int ABSTAIN_VALUE = 3;
+      public static final int NOMINATE_VALUE = 3;
       /**
        * <code>DECLAREWINNER = 4;</code>
        */
@@ -1408,8 +1408,8 @@ public final class Mgmt {
       public static ElectAction valueOf(int value) {
         switch (value) {
           case 1: return DECLAREELECTION;
-          case 2: return NOMINATE;
-          case 3: return ABSTAIN;
+          case 2: return PROPOSAL;
+          case 3: return NOMINATE;
           case 4: return DECLAREWINNER;
           case 5: return DECLAREVOID;
           case 6: return WHOISTHELEADER;
@@ -1467,9 +1467,9 @@ public final class Mgmt {
 
     private int bitField0_;
     public static final int ELECT_ID_FIELD_NUMBER = 2;
-    private int electId_;
+    private long electId_;
     /**
-     * <code>required int32 elect_id = 2;</code>
+     * <code>required int64 elect_id = 2;</code>
      *
      * <pre>
      * election ID (not candidate)
@@ -1479,13 +1479,13 @@ public final class Mgmt {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 elect_id = 2;</code>
+     * <code>required int64 elect_id = 2;</code>
      *
      * <pre>
      * election ID (not candidate)
      * </pre>
      */
-    public int getElectId() {
+    public long getElectId() {
       return electId_;
     }
 
@@ -1614,7 +1614,7 @@ public final class Mgmt {
     }
 
     private void initFields() {
-      electId_ = 0;
+      electId_ = 0L;
       candidateId_ = 0;
       desc_ = "";
       action_ = poke.core.Mgmt.LeaderElection.ElectAction.DECLAREELECTION;
@@ -1647,7 +1647,7 @@ public final class Mgmt {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(2, electId_);
+        output.writeInt64(2, electId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(3, candidateId_);
@@ -1675,7 +1675,7 @@ public final class Mgmt {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, electId_);
+          .computeInt64Size(2, electId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1814,7 +1814,7 @@ public final class Mgmt {
 
       public Builder clear() {
         super.clear();
-        electId_ = 0;
+        electId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         candidateId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -1953,9 +1953,9 @@ public final class Mgmt {
       }
       private int bitField0_;
 
-      private int electId_ ;
+      private long electId_ ;
       /**
-       * <code>required int32 elect_id = 2;</code>
+       * <code>required int64 elect_id = 2;</code>
        *
        * <pre>
        * election ID (not candidate)
@@ -1965,30 +1965,30 @@ public final class Mgmt {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 elect_id = 2;</code>
+       * <code>required int64 elect_id = 2;</code>
        *
        * <pre>
        * election ID (not candidate)
        * </pre>
        */
-      public int getElectId() {
+      public long getElectId() {
         return electId_;
       }
       /**
-       * <code>required int32 elect_id = 2;</code>
+       * <code>required int64 elect_id = 2;</code>
        *
        * <pre>
        * election ID (not candidate)
        * </pre>
        */
-      public Builder setElectId(int value) {
+      public Builder setElectId(long value) {
         bitField0_ |= 0x00000001;
         electId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 elect_id = 2;</code>
+       * <code>required int64 elect_id = 2;</code>
        *
        * <pre>
        * election ID (not candidate)
@@ -1996,7 +1996,7 @@ public final class Mgmt {
        */
       public Builder clearElectId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        electId_ = 0;
+        electId_ = 0L;
         onChanged();
         return this;
       }
@@ -5099,13 +5099,13 @@ public final class Mgmt {
     int getNodeId();
 
     /**
-     * <code>required int32 version = 2;</code>
+     * <code>required int64 version = 2;</code>
      */
     boolean hasVersion();
     /**
-     * <code>required int32 version = 2;</code>
+     * <code>required int64 version = 2;</code>
      */
-    int getVersion();
+    long getVersion();
 
     /**
      * <code>required int64 time = 3;</code>
@@ -5179,7 +5179,7 @@ public final class Mgmt {
             }
             case 16: {
               bitField0_ |= 0x00000002;
-              version_ = input.readInt32();
+              version_ = input.readInt64();
               break;
             }
             case 24: {
@@ -5243,17 +5243,17 @@ public final class Mgmt {
     }
 
     public static final int VERSION_FIELD_NUMBER = 2;
-    private int version_;
+    private long version_;
     /**
-     * <code>required int32 version = 2;</code>
+     * <code>required int64 version = 2;</code>
      */
     public boolean hasVersion() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 version = 2;</code>
+     * <code>required int64 version = 2;</code>
      */
-    public int getVersion() {
+    public long getVersion() {
       return version_;
     }
 
@@ -5274,7 +5274,7 @@ public final class Mgmt {
 
     private void initFields() {
       nodeId_ = 0;
-      version_ = 0;
+      version_ = 0L;
       time_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
@@ -5306,7 +5306,7 @@ public final class Mgmt {
         output.writeInt32(1, nodeId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, version_);
+        output.writeInt64(2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt64(3, time_);
@@ -5326,7 +5326,7 @@ public final class Mgmt {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, version_);
+          .computeInt64Size(2, version_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -5455,7 +5455,7 @@ public final class Mgmt {
         super.clear();
         nodeId_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        version_ = 0;
+        version_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
         time_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -5595,34 +5595,34 @@ public final class Mgmt {
         return this;
       }
 
-      private int version_ ;
+      private long version_ ;
       /**
-       * <code>required int32 version = 2;</code>
+       * <code>required int64 version = 2;</code>
        */
       public boolean hasVersion() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int32 version = 2;</code>
+       * <code>required int64 version = 2;</code>
        */
-      public int getVersion() {
+      public long getVersion() {
         return version_;
       }
       /**
-       * <code>required int32 version = 2;</code>
+       * <code>required int64 version = 2;</code>
        */
-      public Builder setVersion(int value) {
+      public Builder setVersion(long value) {
         bitField0_ |= 0x00000002;
         version_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 version = 2;</code>
+       * <code>required int64 version = 2;</code>
        */
       public Builder clearVersion() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        version_ = 0;
+        version_ = 0L;
         onChanged();
         return this;
       }
@@ -8887,37 +8887,37 @@ public final class Mgmt {
       "ork.NetworkAction\"f\n\rNetworkAction\022\014\n\010NO" +
       "DEJOIN\020\001\022\r\n\tNODELEAVE\020\002\022\014\n\010NODEDEAD\020\003\022\r\n" +
       "\tCREATEMAP\0207\022\014\n\010ANNOUNCE\0208\022\r\n\010SHUTDOWN\020\347" +
-      "\007\"\243\002\n\016LeaderElection\022\020\n\010elect_id\030\002 \002(\005\022\024" +
+      "\007\"\244\002\n\016LeaderElection\022\020\n\010elect_id\030\002 \002(\003\022\024" +
       "\n\014candidate_id\030\003 \002(\005\022\014\n\004desc\030\004 \001(\t\022+\n\006ac" +
       "tion\030\005 \002(\0162\033.LeaderElection.ElectAction\022" +
-      "\023\n\007expires\030\006 \001(\003:\002-1\022\020\n\004hops\030\007 \001(\005:\002-1\"\206",
-      "\001\n\013ElectAction\022\023\n\017DECLAREELECTION\020\001\022\014\n\010N" +
-      "OMINATE\020\002\022\013\n\007ABSTAIN\020\003\022\021\n\rDECLAREWINNER\020" +
-      "\004\022\017\n\013DECLAREVOID\020\005\022\022\n\016WHOISTHELEADER\020\006\022\017" +
-      "\n\013THELEADERIS\020\007\"\200\002\n\014VotingBallot\022\021\n\tball" +
-      "ot_id\030\001 \002(\t\022\014\n\004desc\030\002 \002(\t\022/\n\rballot_form" +
-      "at\030\003 \002(\0162\030.VotingBallot.BallotType\022\023\n\013ex" +
-      "pires_sec\030\006 \001(\003\022\025\n\rmargin_to_win\030\007 \001(\005\022\024" +
-      "\n\010max_hops\030\010 \001(\005:\002-1\"\\\n\nBallotType\022\022\n\016SI" +
-      "MPLEMAJORITY\020\001\022\033\n\027TIMECONSTRAINEDMAJORIT" +
-      "Y\020\002\022\n\n\006RANKED\020\003\022\021\n\rINSTANTRUNOFF\020\004\"O\n\nVo",
-      "tingCast\022\r\n\005voter\030\001 \002(\t\022\021\n\tballot_id\030\002 \002" +
-      "(\t\022\021\n\tcandidate\030\n \001(\005\022\014\n\004rank\030\013 \001(\005\"\220\001\n\014" +
-      "VotingStatus\022\021\n\tballot_id\030\001 \002(\t\022(\n\006statu" +
-      "s\030\002 \002(\0162\030.VotingStatus.VoteStatus\022\016\n\006win" +
-      "ner\030\003 \001(\005\"3\n\nVoteStatus\022\023\n\017BALLOTABANDON" +
-      "ED\020\001\022\020\n\014BALLOTWINNER\020\002\"=\n\013VectorClock\022\017\n" +
-      "\007node_id\030\001 \002(\005\022\017\n\007version\030\002 \002(\005\022\014\n\004time\030" +
-      "\003 \002(\003\"p\n\nMgmtHeader\022\022\n\noriginator\030\002 \002(\005\022" +
-      "\024\n\014securityCode\030\003 \002(\005\022\014\n\004time\030\004 \002(\003\022\032\n\004p" +
-      "ath\030\007 \003(\0132\014.VectorClock\022\016\n\006toNode\030\010 \001(\005\"",
-      "\350\001\n\nManagement\022\033\n\006header\030\001 \002(\0132\013.MgmtHea" +
-      "der\022\027\n\005graph\030\002 \001(\0132\010.Network\022\030\n\004beat\030\003 \001" +
-      "(\0132\n.Heartbeat\022!\n\010election\030\004 \001(\0132\017.Leade" +
-      "rElection\022#\n\014vote_declare\030\007 \001(\0132\r.Voting" +
-      "Ballot\022\036\n\tvote_cast\030\010 \001(\0132\013.VotingCast\022\"" +
-      "\n\013vote_status\030\t \001(\0132\r.VotingStatusB\r\n\tpo" +
-      "ke.coreH\001"
+      "\023\n\007expires\030\006 \001(\003:\002-1\022\020\n\004hops\030\007 \001(\005:\002-1\"\207",
+      "\001\n\013ElectAction\022\023\n\017DECLAREELECTION\020\001\022\014\n\010P" +
+      "ROPOSAL\020\002\022\014\n\010NOMINATE\020\003\022\021\n\rDECLAREWINNER" +
+      "\020\004\022\017\n\013DECLAREVOID\020\005\022\022\n\016WHOISTHELEADER\020\006\022" +
+      "\017\n\013THELEADERIS\020\007\"\200\002\n\014VotingBallot\022\021\n\tbal" +
+      "lot_id\030\001 \002(\t\022\014\n\004desc\030\002 \002(\t\022/\n\rballot_for" +
+      "mat\030\003 \002(\0162\030.VotingBallot.BallotType\022\023\n\013e" +
+      "xpires_sec\030\006 \001(\003\022\025\n\rmargin_to_win\030\007 \001(\005\022" +
+      "\024\n\010max_hops\030\010 \001(\005:\002-1\"\\\n\nBallotType\022\022\n\016S" +
+      "IMPLEMAJORITY\020\001\022\033\n\027TIMECONSTRAINEDMAJORI" +
+      "TY\020\002\022\n\n\006RANKED\020\003\022\021\n\rINSTANTRUNOFF\020\004\"O\n\nV",
+      "otingCast\022\r\n\005voter\030\001 \002(\t\022\021\n\tballot_id\030\002 " +
+      "\002(\t\022\021\n\tcandidate\030\n \001(\005\022\014\n\004rank\030\013 \001(\005\"\220\001\n" +
+      "\014VotingStatus\022\021\n\tballot_id\030\001 \002(\t\022(\n\006stat" +
+      "us\030\002 \002(\0162\030.VotingStatus.VoteStatus\022\016\n\006wi" +
+      "nner\030\003 \001(\005\"3\n\nVoteStatus\022\023\n\017BALLOTABANDO" +
+      "NED\020\001\022\020\n\014BALLOTWINNER\020\002\"=\n\013VectorClock\022\017" +
+      "\n\007node_id\030\001 \002(\005\022\017\n\007version\030\002 \002(\003\022\014\n\004time" +
+      "\030\003 \002(\003\"p\n\nMgmtHeader\022\022\n\noriginator\030\002 \002(\005" +
+      "\022\024\n\014securityCode\030\003 \002(\005\022\014\n\004time\030\004 \002(\003\022\032\n\004" +
+      "path\030\007 \003(\0132\014.VectorClock\022\016\n\006toNode\030\010 \001(\005",
+      "\"\350\001\n\nManagement\022\033\n\006header\030\001 \002(\0132\013.MgmtHe" +
+      "ader\022\027\n\005graph\030\002 \001(\0132\010.Network\022\030\n\004beat\030\003 " +
+      "\001(\0132\n.Heartbeat\022!\n\010election\030\004 \001(\0132\017.Lead" +
+      "erElection\022#\n\014vote_declare\030\007 \001(\0132\r.Votin" +
+      "gBallot\022\036\n\tvote_cast\030\010 \001(\0132\013.VotingCast\022" +
+      "\"\n\013vote_status\030\t \001(\0132\r.VotingStatusB\r\n\tp" +
+      "oke.coreH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

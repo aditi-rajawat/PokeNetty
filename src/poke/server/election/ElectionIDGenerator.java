@@ -15,6 +15,8 @@
  */
 package poke.server.election;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * abstraction for election ID generation
  * 
@@ -23,21 +25,37 @@ package poke.server.election;
  */
 public class ElectionIDGenerator {
 
-	private static int masterID = 0;
+	private static long masterID = -1L;
 
-	/**
-	 * note this ID is sensitive to differences across nodes
-	 * 
-	 * @return
-	 */
-	public static synchronized int nextID() {
-		if (masterID == Integer.MAX_VALUE) {
-			masterID = 0;
-		}
-		return ++masterID;
+//	/**
+//	 * note this ID is sensitive to differences across nodes
+//	 * 
+//	 * @return
+//	 */
+//	public static synchronized int nextID() {
+//		if (masterID == Integer.MAX_VALUE) {
+//			masterID = 0;
+//		}
+//		return ++masterID;
+//	}
+//
+//	public static synchronized void setMasterID(int id) {
+//		masterID = id;
+//	}
+	public static synchronized long nextID(){
+		return System.currentTimeMillis();
 	}
-
-	public static synchronized void setMasterID(int id) {
+	
+	public static synchronized void setMasterID(long id){
 		masterID = id;
 	}
+	
+	public static synchronized long getMasterID(){
+		return masterID;
+	}
+	
+//	public static int secondsSinceStart() {
+//	    return (int) TimeUnit.SECONDS.convert(
+//	        System.currentTimeMillis() - startTime, TimeUnit.MILLISECONDS);
+//	}
 }

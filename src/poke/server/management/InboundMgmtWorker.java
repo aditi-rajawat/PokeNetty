@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import poke.core.Mgmt.Management;
 import poke.server.management.ManagementQueue.ManagementQueueEntry;
+import poke.server.managers.ConnectionManager;
 import poke.server.managers.ElectionManager;
 import poke.server.managers.HeartbeatManager;
 import poke.server.managers.JobManager;
@@ -89,6 +90,10 @@ public class InboundMgmtWorker extends Thread {
 					 * handled by the HeartbeatPusher.
 					 */
 					HeartbeatManager.getInstance().processRequest(mgmt);
+					
+					//Added by Aditi Rajawat
+					HeartbeatManager.getInstance().addAdjacentNodeChannel(mgmt.getHeader().getOriginator(), msg.channel, msg.channel.localAddress(), mgmt);
+					
 
 					/**
 					 * If we have a network (more than one node), check to see
@@ -101,6 +106,7 @@ public class InboundMgmtWorker extends Thread {
 					 * cannot allow for each node joining the network to cause a
 					 * leader election.
 					 */
+					
 					ElectionManager.getInstance().assessCurrentState(mgmt);
 
 				} else if (mgmt.hasElection()) {

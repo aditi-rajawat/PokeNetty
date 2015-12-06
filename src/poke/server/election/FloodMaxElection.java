@@ -26,6 +26,7 @@ import poke.core.Mgmt.LeaderElection.ElectAction;
 import poke.core.Mgmt.Management;
 import poke.core.Mgmt.MgmtHeader;
 import poke.core.Mgmt.VectorClock;
+import poke.server.managers.ConnectionManager;
 
 /**
  * Flood Max (FM) algo is useful for cases where a ring is not formed (e.g.,
@@ -131,7 +132,8 @@ public class FloodMaxElection implements Election {
 			// occurs.
 			if (logger.isDebugEnabled()) {
 			}
-
+			
+	
 			System.out.println("\n\n*********************************************************");
 			System.out.println(" FLOOD MAX ELECTION: Election declared");
 			System.out.println("   Election ID:  " + req.getElectId());
@@ -141,21 +143,22 @@ public class FloodMaxElection implements Election {
 			System.out.println("   Desc:         " + req.getDesc());
 			System.out.print("   Routing tbl:  [");
 			for (VectorClock rp : rtes)
-				System.out.print("Node " + rp.getNodeId() + " (" + rp.getVersion() + "," + rp.getTime() + "), ");
+			System.out.print("Node " + rp.getNodeId() + " (" + rp.getVersion() + "," + rp.getTime() + "), ");
 			System.out.println("]");
 			System.out.println("*********************************************************\n\n");
-
+	
 			// sync master IDs to current election
-			ElectionIDGenerator.setMasterID(req.getElectId());
-
 			/**
 			 * a new election can be declared over an existing election.
 			 * 
 			 * TODO need to have an monotonically increasing ID that we can test
 			 */
+
+			ElectionIDGenerator.setMasterID(req.getElectId());
 			boolean isNew = updateCurrent(req);
 			rtn = castVote(mgmt, isNew);
 
+			
 		} else if (req.getAction().getNumber() == ElectAction.DECLAREVOID_VALUE) {
 			// no one was elected, I am dropping into standby mode
 			logger.info("TODO: no one was elected, I am dropping into standby mode");
@@ -167,11 +170,9 @@ public class FloodMaxElection implements Election {
 			updateCurrent(mgmt.getElection());
 			current.active = false; // it's over
 			notify(true, req.getCandidateId());
-		} else if (req.getAction().getNumber() == ElectAction.ABSTAIN_VALUE) {
-			// for some reason, a node declines to vote - therefore, do nothing
 		} else if (req.getAction().getNumber() == ElectAction.NOMINATE_VALUE) {
-			boolean isNew = updateCurrent(mgmt.getElection());
-			rtn = castVote(mgmt, isNew);
+		//	boolean isNew = updateCurrent(mgmt.getElection());
+			rtn = castVote(mgmt, false);
 		} else {
 			// this is me!
 		}
@@ -180,9 +181,9 @@ public class FloodMaxElection implements Election {
 	}
 
 	@Override
-	public Integer getElectionId() {
+	public long getElectionId() {
 		if (current == null)
-			return null;
+			return 0;
 		return current.electionID;
 	}
 
@@ -231,11 +232,13 @@ public class FloodMaxElection implements Election {
 			listener.concludeWith(success, leader);
 	}
 
-	private boolean updateCurrent(LeaderElection req) {
+	public boolean updateCurrent(LeaderElection req) {
 		boolean isNew = false;
 
 		if (current == null) {
 			current = new ElectionState();
+			// Added by Aditi Rajawat
+			current.maxVotes = req.getHops();	// Holds the no. of max favorable votes required 
 			isNew = true;
 		}
 
@@ -252,7 +255,7 @@ public class FloodMaxElection implements Election {
 	}
 
 	@Override
-	public Integer createElectionID() {
+	public long createElectionID() {
 		return ElectionIDGenerator.nextID();
 	}
 
@@ -281,7 +284,7 @@ public class FloodMaxElection implements Election {
 			return null;
 		}
 
-		logger.info("casting vote in election " + req.getElectId());
+		logger.info("casting vote in election " + req.getElectId()+ " at stage "+ req.getAction().getNumber());
 
 		// DANGER! If we return because this node ID is in the list, we have a
 		// high chance an election will not converge as the maxHops determines
@@ -307,63 +310,42 @@ public class FloodMaxElection implements Election {
 		mhb.setTime(System.currentTimeMillis());
 		mhb.setSecurityCode(-999); // TODO add security
 
-		// reversing path. If I'm the farthest a message can travel, reverse the
-		// sending
-		if (elb.getHops() == 0)
-			mhb.clearPath();
-		else
-			mhb.addAllPath(mgmt.getHeader().getPathList());
 
 		mhb.setOriginator(mgmt.getHeader().getOriginator());
 
 		elb.setElectId(req.getElectId());
-		elb.setAction(ElectAction.NOMINATE);
-		elb.setDesc(req.getDesc());
-		elb.setExpires(req.getExpires());
-		elb.setCandidateId(req.getCandidateId());
-
-		// my vote
-		if (req.getCandidateId() == this.nodeId) {
-			// if I am not in the list and the candidate is myself, I can
-			// declare myself to be the leader.
-			//
-			// this is non-deterministic as it assumes the message has
-			// reached all nodes in the network (because we know the
-			// diameter or the number of nodes).
-			//
-			// can end up with a partitioned graph of leaders if hops <
-			// diameter!
-
-			// this notify goes out to on-node listeners and will arrive before
-			// the other nodes receive notice.
-			notify(true, this.nodeId);
-
-			elb.setAction(ElectAction.DECLAREWINNER);
-			elb.setHops(mgmt.getHeader().getPathCount());
-			logger.info("Node " + this.nodeId + " is declaring itself the leader");
-		} else {
-			if (req.getCandidateId() < this.nodeId)
+		// Added by Aditi Rajawat
+		if(req.getAction().getNumber() == ElectAction.DECLAREELECTION_VALUE){
+			elb.setAction(ElectAction.NOMINATE);
+			elb.setCandidateId(req.getCandidateId());
+			if (req.getCandidateId() < this.nodeId){
 				elb.setCandidateId(this.nodeId);
-
-			if (req.getHops() == -1)
-				elb.setHops(-1);
-			else
-				elb.setHops(req.getHops() - 1);
-
-			if (elb.getHops() == 0) {
-				// reverse travel of the message to ensure it gets back to
-				// the originator
-				elb.setHops(mgmt.getHeader().getPathCount());
-
-				// no clear winner, send back the candidate with the highest
-				// known ID. So, if a candidate sees itself, it will
-				// declare itself to be the winner (see above).
-			} else {
-				// forwarding the message on so, keep the history where the
-				// message has been
-				mhb.addAllPath(mgmt.getHeader().getPathList());
+				current.candidate = this.nodeId;
 			}
 		}
+		else if(req.getAction().getNumber() == ElectAction.NOMINATE_VALUE){
+			current.receivedVotes++;
+			if(req.getCandidateId()> current.candidate){
+				current.candidate = req.getCandidateId();
+			}
+			if(current.receivedVotes == req.getHops()){
+				elb.setCandidateId(current.candidate);
+				elb.setAction(ElectAction.DECLAREWINNER);
+				notify(true, current.candidate);
+			}
+			else{
+				return null;
+			}
+					
+		}
+		
+		elb.setDesc(req.getDesc());
+		elb.setExpires(req.getExpires());
+		
+
+		// Added by Aditi Rajawat
+		//int totalConns = ConnectionManager.getNumMgmtConnections();
+		elb.setHops(req.getHops());
 
 		// add myself (may allow duplicate entries, if cycling is allowed)
 		VectorClock.Builder rpb = VectorClock.newBuilder();

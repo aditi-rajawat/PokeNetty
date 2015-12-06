@@ -39,6 +39,7 @@ import poke.server.conf.NodeDesc;
 import poke.server.conf.ServerConf;
 import poke.server.management.ManagementInitializer;
 import poke.server.management.ManagementQueue;
+import poke.server.managers.ConnectionManager;
 import poke.server.managers.ElectionManager;
 import poke.server.managers.HeartbeatData;
 import poke.server.managers.HeartbeatManager;
@@ -273,7 +274,7 @@ public class Server {
 		// create manager for leader election. The number of votes (default 1)
 		// is used to break ties where there are an even number of nodes.
 		electionMgr = ElectionManager.initManager(conf);
-
+	
 		// create manager for accepting jobs
 	//	jobMgr = JobManager.initManager(conf);
 
@@ -287,6 +288,7 @@ public class Server {
 			// fn(from, to)
 			HeartbeatPusher.getInstance().connectToThisNode(conf.getNodeId(), node);
 		}
+		
 		heartbeatMgr.start();
 
 		// manage heartbeatMgr connections

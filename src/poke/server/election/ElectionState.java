@@ -30,17 +30,20 @@ import poke.core.Mgmt.LeaderElection.ElectAction;
 public class ElectionState {
 
 	
-	protected Integer id;
+	protected int id;
 	protected String desc;
 	protected int version = 0;
 	protected ElectAction state = ElectAction.DECLAREELECTION;
-	protected Integer electionID;
+	protected long electionID;
 	protected long startedOn = 0, lastVoteOn = 0, maxDuration = -1;
 	protected int candidate;
 	protected ElectionListener listener;
 	protected boolean active = false;
+	// Added by Aditi Rajawat
+	protected int receivedVotes = 0;
+	protected int maxVotes = 0;
 
 	public boolean isActive() {
-		return id != null && active;
+		return id != 0 && active;
 	}
 }

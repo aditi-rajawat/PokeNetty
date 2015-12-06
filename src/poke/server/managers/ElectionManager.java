@@ -72,15 +72,16 @@ public class ElectionManager implements ElectionListener {
 	private static ServerConf conf;
 
 	// number of times we try to get the leader when a node starts up
-	private int firstTime = 4;
+	private int firstTime = 3;	// keep it 4
 
 	/** The election that is in progress - only ONE! */
 	private Election election;
-	private int electionCycle = -1;
+	private long electionCycle = -1;
 	private Integer syncPt = 1;
 
 	/** The leader */
 	Integer leaderNode;
+
 
 	public static ElectionManager initManager(ServerConf conf) {
 		ElectionManager.conf = conf;
@@ -122,7 +123,9 @@ public class ElectionManager implements ElectionListener {
 	 * with the leader.
 	 */
 	public void startElection() {
+		logger.info("Election started by node " + conf.getNodeId());
 		electionCycle = electionInstance().createElectionID();
+		logger.info("ADITIIIII SEE---> "+ electionCycle);
 		
 		LeaderElection.Builder elb = LeaderElection.newBuilder();
 		elb.setElectId(electionCycle);
@@ -133,8 +136,13 @@ public class ElectionManager implements ElectionListener {
 
 		// bias the voting with my number of votes (for algos that use vote
 		// counting)
-
-		// TODO use voting int votes = conf.getNumberOfElectionVotes();
+		// Added by Aditi Rajawat
+		int totalConns = ConnectionManager.getNumMgmtConnections();
+		elb.setHops(totalConns);
+//		if(totalConns%2 == 0)
+//			elb.setHops(totalConns/2);
+//		else
+//			elb.setHops((totalConns/2)+1);
 
 		MgmtHeader.Builder mhb = MgmtHeader.newBuilder();
 		mhb.setOriginator(conf.getNodeId());
@@ -144,12 +152,15 @@ public class ElectionManager implements ElectionListener {
 		VectorClock.Builder rpb = VectorClock.newBuilder();
 		rpb.setNodeId(conf.getNodeId());
 		rpb.setTime(mhb.getTime());
-		rpb.setVersion(electionCycle);
+		rpb.setVersion((int)electionCycle);
 		mhb.addPath(rpb);
 
 		Management.Builder mb = Management.newBuilder();
 		mb.setHeader(mhb.build());
 		mb.setElection(elb.build());
+		
+		// Added by Aditi Rajawat
+		electionInstance().updateCurrent(mb.build().getElection());
 
 		// now send it out to all my edges
 		logger.info("Election started by node " + conf.getNodeId());
@@ -164,6 +175,7 @@ public class ElectionManager implements ElectionListener {
 			return;
 
 		LeaderElection req = mgmt.getElection();
+		
 
 		// when a new node joins the network it will want to know who the leader
 		// is - we kind of ram this request-response in the process request
@@ -189,9 +201,29 @@ public class ElectionManager implements ElectionListener {
 			}
 		}
 
+		// Added by Aditi Rajawat
+		if((electionCycle == -1) || (electionCycle == req.getElectId())){		// This node has not started the election, should participate in the current election
+			logger.info("Processing the first election received..");
+		}
+		else if(req.getElectId()< electionCycle){	// Means the node received an election which was started before the one the node is processing
+			logger.info("Received an older election..clearing the previous election as we are considering the oldest election");
+			electionInstance().clear();   // Clear the previous election state
+		}
+		electionCycle = req.getElectId();
 		Management rtn = electionInstance().process(mgmt);
-		if (rtn != null)
-			ConnectionManager.broadcast(rtn);
+		if (rtn != null){
+			
+			try {
+				if(rtn.getElection().getAction().getNumber() == ElectAction.DECLAREWINNER_VALUE)
+					ConnectionManager.broadcast(rtn);
+				else
+					ConnectionManager.getConnection(mgmt.getHeader().getOriginator(), true).write(rtn);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+			
+		
 	}
 
 	/**
@@ -224,6 +256,8 @@ public class ElectionManager implements ElectionListener {
 		}
 
 		election.clear();
+		// Added by Aditi Rajawat
+		electionCycle = -1;	// No election in progress
 	}
 
 	private void respondToWhoIsTheLeader(Management mgmt) {
@@ -258,7 +292,6 @@ public class ElectionManager implements ElectionListener {
 		mb.setElection(elb.build());
 
 		// now send it to the requester
-		logger.info("Election started by node " + conf.getNodeId());
 		try {
 
 			ConnectionManager.getConnection(mgmt.getHeader().getOriginator(), true).write(mb.build());
@@ -327,5 +360,10 @@ public class ElectionManager implements ElectionListener {
 
 		return election;
 
+	}
+	
+	// Added by Aditi Rajawat
+	public void initialiseFirstTime(){
+		this.firstTime = 2;
 	}
 }

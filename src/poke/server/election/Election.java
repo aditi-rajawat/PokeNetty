@@ -15,6 +15,7 @@
  */
 package poke.server.election;
 
+import poke.core.Mgmt.LeaderElection;
 import poke.core.Mgmt.Management;
 
 /**
@@ -53,14 +54,14 @@ public interface Election {
 	 * 
 	 * @return
 	 */
-	Integer getElectionId();
+	long getElectionId();
 
 	/**
 	 * create the election ID for messaging
 	 * 
 	 * @return
 	 */
-	Integer createElectionID();
+	long createElectionID();
 
 	/**
 	 * The winner of the election
@@ -85,4 +86,6 @@ public interface Election {
 	 *            The ID of a node - this not allowed to be null!
 	 */
 	void setNodeId(int nodeId);
+	
+	boolean updateCurrent(LeaderElection req);	// Added by Aditi Rajawat 
 }

@@ -160,14 +160,17 @@ public class HeartbeatManager extends Thread {
 	 * @param ch
 	 * @param sa
 	 */
-	public void addAdjacentNodeChannel(int nodeId, Channel ch, SocketAddress sa) {
+	// Modified by Aditi Rajawat
+	public void addAdjacentNodeChannel(int nodeId, Channel ch, SocketAddress sa, Management mgmt) {
 		HeartbeatData hd = incomingHB.get(nodeId);
 		if (hd != null) {
-			hd.setConnection(ch, sa, nodeId);
-			hd.setStatus(BeatStatus.Active);
-
-			// when the channel closes, remove it from the incomingHB list
-			ch.closeFuture().addListener(new CloseHeartListener(hd));
+			if(ConnectionManager.getConnection(nodeId, true) == null){
+				hd.setConnection(ch, sa, nodeId);
+				hd.setStatus(BeatStatus.Active);
+	
+				// when the channel closes, remove it from the incomingHB list
+				ch.closeFuture().addListener(new CloseHeartListener(hd, mgmt));	// Modified by Aditi Rajawat
+			}
 		} else {
 			logger.error("Received a HB ack from an unknown node, node ID = ", nodeId);
 			// TODO actions?
@@ -182,14 +185,15 @@ public class HeartbeatManager extends Thread {
 	 * @param ch
 	 * @param sa
 	 */
-	public void addOutgoingChannel(int nodeId, String host, int mgmtport, Channel ch, SocketAddress sa) {
+	// Modified by Aditi Rajawat
+	public void addOutgoingChannel(int nodeId, String host, int mgmtport, Channel ch, SocketAddress sa, Management mgmt) {
 		if (!outgoingHB.containsKey(ch)) {
 			HeartbeatData heart = new HeartbeatData(nodeId, host, null, mgmtport);
 			heart.setConnection(ch, sa, nodeId);
 			outgoingHB.put(ch, heart);
 
 			// when the channel closes, remove it from the outgoingHB
-			ch.closeFuture().addListener(new CloseHeartListener(heart));
+			ch.closeFuture().addListener(new CloseHeartListener(heart, mgmt));	// Modified by Aditi Rajawat
 		} else {
 			logger.error("Received a HB connection unknown to the server, node ID = ", nodeId);
 			// TODO actions?
@@ -277,18 +281,41 @@ public class HeartbeatManager extends Thread {
 
 	public class CloseHeartListener implements ChannelFutureListener {
 		private HeartbeatData heart;
-
-		public CloseHeartListener(HeartbeatData heart) {
+		private Management mgmt; //Added by Aditi Rajawat
+		
+		public CloseHeartListener(HeartbeatData heart){
 			this.heart = heart;
+		}
+
+		// Added by Aditi Rajawat
+		public CloseHeartListener(HeartbeatData heart, Management mgmt) {
+			this.heart = heart;
+			this.mgmt = mgmt;		
 		}
 
 		@Override
 		public void operationComplete(ChannelFuture future) throws Exception {
 			if (outgoingHB.containsValue(heart)) {
 				logger.warn("HB outgoing channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());
+				// Added by Aditi Rajawat
+				heart.clearHeartData();
+				if(heart.getNodeId() == ElectionManager.getInstance().leaderNode.intValue()){
+					logger.info("Network has lost its LEADER!!!! Restart the leader election..");
+					ElectionManager.getInstance().leaderNode = null;
+					ElectionManager.getInstance().initialiseFirstTime();
+					ElectionManager.getInstance().assessCurrentState(mgmt);
+				}
 				outgoingHB.remove(future.channel());
 			} else if (incomingHB.containsValue(heart)) {
 				logger.warn("HB incoming channel closing for node '" + heart.getNodeId() + "' at " + heart.getHost());
+				// Added by Aditi Rajawat
+				heart.clearHeartData();
+				if(heart.getNodeId() == ElectionManager.getInstance().leaderNode.intValue()){
+					logger.info("Network has lost its LEADER!!!! Restart the leader election..");
+					ElectionManager.getInstance().leaderNode = null;
+					ElectionManager.getInstance().initialiseFirstTime();
+					ElectionManager.getInstance().assessCurrentState(mgmt);
+				}
 				incomingHB.remove(future.channel());
 			}
 		}

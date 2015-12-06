@@ -22,7 +22,7 @@ message Network {
 }
 
 message LeaderElection {
-   required int32 elect_id = 2; // election ID (not candidate)
+   required int64 elect_id = 2; // election ID (not candidate)
    required int32 candidate_id = 3;
    optional string desc = 4;
    required ElectAction action = 5;
@@ -38,8 +38,8 @@ message LeaderElection {
    
    enum ElectAction {
       DECLAREELECTION = 1;
-      NOMINATE = 2;
-      ABSTAIN = 3;
+      PROPOSAL = 2;
+      NOMINATE = 3;
       DECLAREWINNER = 4;
       DECLAREVOID = 5;
       WHOISTHELEADER = 6;
@@ -104,7 +104,7 @@ message VotingStatus {
 // implementation of a Vector Clock
 message VectorClock {
     required int32 node_id = 1;
-    required int32 version = 2;
+    required int64 version = 2;
     required int64 time = 3;
 }
 

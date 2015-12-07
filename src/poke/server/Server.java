@@ -319,11 +319,11 @@ public class Server {
 		Thread mthread = new Thread(mgt);
 		mthread.start();
 
-//		StartCommunication comm = new StartCommunication(conf);
-//		logger.info("Server " + conf.getNodeId() + " ready");
-//
-//		Thread cthread = new Thread(comm);
-//		cthread.start();
+		StartCommunication comm = new StartCommunication(conf);
+		logger.info("Server " + conf.getNodeId() + " ready");
+
+		Thread cthread = new Thread(comm);
+		cthread.start();
 	}
 
 	/**

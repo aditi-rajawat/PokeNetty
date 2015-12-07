@@ -364,6 +364,6 @@ public class ElectionManager implements ElectionListener {
 	
 	// Added by Aditi Rajawat
 	public void initialiseFirstTime(){
-		this.firstTime = 2;
+		this.firstTime = 4;
 	}
 }
